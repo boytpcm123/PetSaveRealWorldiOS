@@ -32,28 +32,23 @@
 
 import Foundation
 
-struct Animal: Codable {
-  var id: Int?
-  let organizationId: String?
-  let url: URL?
-  let type: String
-  let species: String?
-  var breeds: Breed
-  var colors: APIColors
-  let age: Age
-  let gender: Gender
-  let size: Size
-  let coat: Coat?
-  let name: String
-  let description: String?
-  let photos: [PhotoSizes]
-  let videos: [VideoLink]
-  let status: AdoptionStatus
-  var attributes: AnimalAttributes
-  var environment: AnimalEnvironment?
-  let tags: [String]
-  var contact: Contact
-  let publishedAt: String?
-  let distance: Double?
-  var ranking: Int? = 0
+private struct AnimalsMock: Codable {
+  let animals: [Animal]
+}
+
+private func loadAnimals() -> [Animal] {
+
+  guard let url = Bundle.main.url(forResource: "AnimalsMock", withExtension: "json"),
+        let data = try? Data(contentsOf: url) else {
+          return []
+        }
+
+  let decoder = JSONDecoder()
+  decoder.keyDecodingStrategy = .convertFromSnakeCase
+  let jsonMock = try? decoder.decode(AnimalsMock.self, from: data)
+  return jsonMock?.animals ?? []
+}
+
+extension Animal {
+  static let mock = loadAnimals()
 }
