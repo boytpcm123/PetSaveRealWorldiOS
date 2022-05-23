@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -32,50 +32,44 @@
 
 import SwiftUI
 
-struct AnimalsNearYouView: View {
-
-  @State var animals: [Animal] = []
-  @State var isLoading = true
-  private let requestManager = RequestManager()
-
+struct AnimalRow: View {
+  
+  let animal: Animal
+  
   var body: some View {
-    NavigationView {
-      List {
-        ForEach(animals) { animal in
-          AnimalRow(animal: animal)
-        }
+    HStack {
+      AsyncImage(url: animal.picture) { image in
+        image.resizable()
+      } placeholder: {
+        Image("rw-logo")
+          .resizable()
+          .overlay {
+            if animal.picture != nil {
+              ProgressView()
+                .frame(maxWidth: .infinity,
+                       maxHeight: .infinity)
+                .background(.gray.opacity(0.4))
+            }
+          }
       }
-      .task {
-        await fetchAnimals()
+      .aspectRatio(contentMode: .fit)
+      .frame(width: 112, height: 112)
+      .cornerRadius(8)
+      
+      VStack(alignment: .leading) {
+        Text(animal.name)
+          .multilineTextAlignment(.center)
+          .font(.title3)
       }
-      .listStyle(.plain)
-      .navigationTitle("Animals near you")
-      .overlay {
-        if isLoading {
-          ProgressView("Finding Animals near you...")
-        }
-      }
-    }.navigationViewStyle(StackNavigationViewStyle())
-  }
-
-  func fetchAnimals() async {
-    do {
-      let animalsContainer: AnimalsContainer = try await requestManager.perform(AnimalsRequest.getAnimalsWith(page: 1, latitude: nil, longitude: nil))
-
-      self.animals = animalsContainer.animals
-
-      await stopLoading()
-    } catch {}
-  }
-
-  @MainActor
-  func stopLoading() async {
-    isLoading = false
+      .lineLimit(1)
+    }
   }
 }
 
-struct AnimalsNearYouView_Previews: PreviewProvider {
+struct AnimalRow_Previews: PreviewProvider {
   static var previews: some View {
-    AnimalsNearYouView()
+    if let animal = Animal.mock.first {
+      AnimalRow(animal: animal)
+    }
   }
 }

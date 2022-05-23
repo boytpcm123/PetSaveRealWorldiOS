@@ -45,7 +45,7 @@ struct APIManager: APIManagerProtocol {
     self.urlSession = urlSession
   }
 
-  func perform(_ request: RequestProtocol, authToken: String) async throws -> Data {
+  func perform(_ request: RequestProtocol, authToken: String = "") async throws -> Data {
     let (data, response) = try await urlSession.data(for: request.createURLRequest(authToken: authToken))
 
     guard let httpResponse = response as? HTTPURLResponse,

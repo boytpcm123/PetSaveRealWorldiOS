@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,52 +30,56 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import SwiftUI
+import XCTest
+@testable import PetSave
 
-struct AnimalsNearYouView: View {
+class RequestManagerTests: XCTestCase {
 
-  @State var animals: [Animal] = []
-  @State var isLoading = true
-  private let requestManager = RequestManager()
+  private var requestManager: RequestManagerProtocol?
 
-  var body: some View {
-    NavigationView {
-      List {
-        ForEach(animals) { animal in
-          AnimalRow(animal: animal)
-        }
-      }
-      .task {
-        await fetchAnimals()
-      }
-      .listStyle(.plain)
-      .navigationTitle("Animals near you")
-      .overlay {
-        if isLoading {
-          ProgressView("Finding Animals near you...")
-        }
-      }
-    }.navigationViewStyle(StackNavigationViewStyle())
+  override func setUp() {
+    super.setUp()
+
+    guard let userDefaults = UserDefaults(suiteName: #file) else {
+      return
+    }
+
+    userDefaults.removePersistentDomain(forName: #file)
+
+    requestManager = RequestManager(
+      apiManager: APIManagerMock(),
+      accessTokenManager: AccessTokenManager(userDefaults: userDefaults)
+    )
   }
 
-  func fetchAnimals() async {
-    do {
-      let animalsContainer: AnimalsContainer = try await requestManager.perform(AnimalsRequest.getAnimalsWith(page: 1, latitude: nil, longitude: nil))
+  func testRequestAnimals() async throws {
+    // 1
+    guard let container: AnimalsContainer =
+            try await requestManager?.perform(AnimalsRequestMock.getAnimals)
+    else {
+      XCTFail("Didn't get data from the request manager")
+      return
+    }
 
-      self.animals = animalsContainer.animals
+    let animals = container.animals
 
-      await stopLoading()
-    } catch {}
+    // 2
+    let first = animals.first
+    let last = animals.last
+
+    // 3
+    XCTAssertEqual(first?.name, "Kiki")
+    XCTAssertEqual(first?.age.rawValue, "Adult")
+    XCTAssertEqual(first?.gender.rawValue, "Female")
+    XCTAssertEqual(first?.size.rawValue, "Medium")
+    XCTAssertEqual(first?.coat?.rawValue, "Short")
+
+    XCTAssertEqual(last?.name, "Midnight")
+    XCTAssertEqual(last?.age.rawValue, "Adult")
+    XCTAssertEqual(last?.gender.rawValue, "Female")
+    XCTAssertEqual(last?.size.rawValue, "Large")
+    XCTAssertEqual(last?.coat, nil)
   }
 
-  @MainActor
-  func stopLoading() async {
-    isLoading = false
-  }
-}
 
-struct AnimalsNearYouView_Previews: PreviewProvider {
-  static var previews: some View {
-    AnimalsNearYouView()
-  }
 }

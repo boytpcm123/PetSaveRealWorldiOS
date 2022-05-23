@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,52 +30,22 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import SwiftUI
+import Foundation
+@testable import PetSave
 
-struct AnimalsNearYouView: View {
+enum AnimalsRequestMock: RequestProtocol {
 
-  @State var animals: [Animal] = []
-  @State var isLoading = true
-  private let requestManager = RequestManager()
+  case getAnimals
 
-  var body: some View {
-    NavigationView {
-      List {
-        ForEach(animals) { animal in
-          AnimalRow(animal: animal)
-        }
-      }
-      .task {
-        await fetchAnimals()
-      }
-      .listStyle(.plain)
-      .navigationTitle("Animals near you")
-      .overlay {
-        if isLoading {
-          ProgressView("Finding Animals near you...")
-        }
-      }
-    }.navigationViewStyle(StackNavigationViewStyle())
+  var path: String {
+    guard let path = Bundle.main.path(forResource: "AnimalsMock",
+                                      ofType: "json") else {
+      return ""
+    }
+    return path
   }
 
-  func fetchAnimals() async {
-    do {
-      let animalsContainer: AnimalsContainer = try await requestManager.perform(AnimalsRequest.getAnimalsWith(page: 1, latitude: nil, longitude: nil))
-
-      self.animals = animalsContainer.animals
-
-      await stopLoading()
-    } catch {}
-  }
-
-  @MainActor
-  func stopLoading() async {
-    isLoading = false
-  }
-}
-
-struct AnimalsNearYouView_Previews: PreviewProvider {
-  static var previews: some View {
-    AnimalsNearYouView()
+  var requestType: RequestType {
+    .GET
   }
 }

@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,52 +30,56 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import SwiftUI
+import XCTest
+@testable import PetSave
 
-struct AnimalsNearYouView: View {
+class AccessTokenManagerTests: XCTestCase {
 
-  @State var animals: [Animal] = []
-  @State var isLoading = true
-  private let requestManager = RequestManager()
+  private var accessTokenManager: AccessTokenManagerProtocol?
+  let token = AccessTokenTestHelper.randomAPIToken()
 
-  var body: some View {
-    NavigationView {
-      List {
-        ForEach(animals) { animal in
-          AnimalRow(animal: animal)
-        }
-      }
-      .task {
-        await fetchAnimals()
-      }
-      .listStyle(.plain)
-      .navigationTitle("Animals near you")
-      .overlay {
-        if isLoading {
-          ProgressView("Finding Animals near you...")
-        }
-      }
-    }.navigationViewStyle(StackNavigationViewStyle())
+  override func setUp() {
+    super.setUp()
+
+    guard let userDefaults = UserDefaults(suiteName: #file) else {
+      return
+    }
+
+    userDefaults.removePersistentDomain(forName: #file)
+    userDefaults.set(token.expiresAt.timeIntervalSince1970, forKey: AppUserDefaultsKeys.expiresAt)
+    userDefaults.set(token.bearerAccessToken, forKey: AppUserDefaultsKeys.bearerAccessToken)
+
+    accessTokenManager = AccessTokenManager(userDefaults: userDefaults)
   }
 
-  func fetchAnimals() async {
-    do {
-      let animalsContainer: AnimalsContainer = try await requestManager.perform(AnimalsRequest.getAnimalsWith(page: 1, latitude: nil, longitude: nil))
+  func testRequestToken() async throws {
+    guard let token = accessTokenManager?.fetchToken() else {
+      XCTFail("Didn't get token from the access token manager")
+      return
+    }
 
-      self.animals = animalsContainer.animals
-
-      await stopLoading()
-    } catch {}
+    XCTAssertFalse(token.isEmpty)
   }
 
-  @MainActor
-  func stopLoading() async {
-    isLoading = false
-  }
-}
+  func testCachedToken() async throws {
+    guard let sameToken = accessTokenManager?.fetchToken() else {
+      XCTFail("Didn't get token from the access token manager")
+      return
+    }
 
-struct AnimalsNearYouView_Previews: PreviewProvider {
-  static var previews: some View {
-    AnimalsNearYouView()
+    XCTAssertEqual(token.bearerAccessToken, sameToken)
   }
+
+  func testRefreshToken() async throws {
+    let randomToken = AccessTokenTestHelper.randomAPIToken()
+    guard let accessTokenManager = accessTokenManager else {
+      XCTFail("Access token manager object is nil")
+      return
+    }
+
+    try accessTokenManager.refreshWith(apiToken: randomToken)
+    XCTAssertNotEqual(token.bearerAccessToken, accessTokenManager.fetchToken())
+    XCTAssertEqual(randomToken.bearerAccessToken, accessTokenManager.fetchToken())
+  }
+
 }
