@@ -42,4 +42,31 @@ class CoreDataTests: XCTestCase {
   override func tearDownWithError() throws {
     try super.tearDownWithError()
   }
+
+  func testToManagedObject() throws {
+    //1
+    let previewContext =
+    PersistenceController.preview.container.viewContext
+    //2
+    let fetchRequest = AnimalEntity.fetchRequest()
+    fetchRequest.fetchLimit = 1
+    fetchRequest.sortDescriptors =
+    [NSSortDescriptor(keyPath: \AnimalEntity.name,
+                      ascending: true)]
+    guard let results = try? previewContext.fetch(fetchRequest),
+          let first = results.first else { return }
+    //3
+    XCTAssert(first.name == "CHARLA", """
+   Pet name did not match, was expecting Kiki, got
+   \(String(describing: first.name))
+   """)
+    XCTAssert(first.type == "Dog", """
+   Pet type did not match, was expecting Cat, got
+   \(String(describing: first.type))
+   """)
+    XCTAssert(first.coat.rawValue == "Short", """
+   Pet coat did not match, was expecting Short, got
+   \(first.coat.rawValue)
+   """)
+  }
 }

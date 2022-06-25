@@ -34,7 +34,7 @@ import SwiftUI
 
 struct AnimalRow: View {
   
-  let animal: Animal
+  let animal: AnimalEntity
   
   var body: some View {
     HStack {
@@ -57,7 +57,7 @@ struct AnimalRow: View {
       .cornerRadius(8)
       
       VStack(alignment: .leading) {
-        Text(animal.name)
+        Text(animal.name ?? "No Name Available")
           .multilineTextAlignment(.center)
           .font(.title3)
       }
@@ -68,7 +68,7 @@ struct AnimalRow: View {
 
 struct AnimalRow_Previews: PreviewProvider {
   static var previews: some View {
-    if let animal = Animal.mock.first {
+    if let animal = CoreDataHelper.getTestAnimalEntity() {
       AnimalRow(animal: animal)
     }
   }
