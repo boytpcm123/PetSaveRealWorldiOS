@@ -45,6 +45,8 @@
 		59617AD62837A4B4003AD172 /* DataParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59617AD52837A4B4003AD172 /* DataParser.swift */; };
 		59617AD92837A6B5003AD172 /* AuthTokenRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59617AD82837A6B5003AD172 /* AuthTokenRequest.swift */; };
 		59617ADC2837AEB2003AD172 /* APIToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59617ADB2837AEB2003AD172 /* APIToken.swift */; };
+		66F27A9D286725530030CC04 /* RequestManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F27A9C286725530030CC04 /* RequestManagerMock.swift */; };
+		66F27AA02867FEA60030CC04 /* AnimalsNearYouViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F27A9F2867FEA60030CC04 /* AnimalsNearYouViewModel.swift */; };
 		845137A62796247E00A4DA57 /* SuggestionsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845137A32796247E00A4DA57 /* SuggestionsGrid.swift */; };
 		845137A72796247E00A4DA57 /* AnimalTypeSuggestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845137A42796247E00A4DA57 /* AnimalTypeSuggestionView.swift */; };
 		845137A82796247E00A4DA57 /* EmptyResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845137A52796247E00A4DA57 /* EmptyResultsView.swift */; };
@@ -143,6 +145,8 @@
 		59617AD52837A4B4003AD172 /* DataParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataParser.swift; sourceTree = "<group>"; };
 		59617AD82837A6B5003AD172 /* AuthTokenRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTokenRequest.swift; sourceTree = "<group>"; };
 		59617ADB2837AEB2003AD172 /* APIToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIToken.swift; sourceTree = "<group>"; };
+		66F27A9C286725530030CC04 /* RequestManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestManagerMock.swift; sourceTree = "<group>"; };
+		66F27A9F2867FEA60030CC04 /* AnimalsNearYouViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimalsNearYouViewModel.swift; sourceTree = "<group>"; };
 		845137A32796247E00A4DA57 /* SuggestionsGrid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuggestionsGrid.swift; sourceTree = "<group>"; };
 		845137A42796247E00A4DA57 /* AnimalTypeSuggestionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimalTypeSuggestionView.swift; sourceTree = "<group>"; };
 		845137A52796247E00A4DA57 /* EmptyResultsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyResultsView.swift; sourceTree = "<group>"; };
@@ -282,6 +286,7 @@
 			children = (
 				592F6F8B283A40560042019B /* APIManagerMock.swift */,
 				592F6F8F283A42E20042019B /* AnimalsRequestMock.swift */,
+				66F27A9C286725530030CC04 /* RequestManagerMock.swift */,
 			);
 			path = mock;
 			sourceTree = "<group>";
@@ -365,6 +370,14 @@
 			path = model;
 			sourceTree = "<group>";
 		};
+		66F27A9E2867FE960030CC04 /* viewModels */ = {
+			isa = PBXGroup;
+			children = (
+				66F27A9F2867FEA60030CC04 /* AnimalsNearYouViewModel.swift */,
+			);
+			path = viewModels;
+			sourceTree = "<group>";
+		};
 		847F4A0126D7549300B94FB8 /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -433,6 +446,7 @@
 		AE6A376B269A86560054C842 /* AnimalsNearYou */ = {
 			isa = PBXGroup;
 			children = (
+				66F27A9E2867FE960030CC04 /* viewModels */,
 				AE6A376E269B54A70054C842 /* views */,
 			);
 			path = AnimalsNearYou;
@@ -766,6 +780,7 @@
 				593C54E2283205EB008CFA0A /* AnimalsMock.swift in Sources */,
 				59617AD62837A4B4003AD172 /* DataParser.swift in Sources */,
 				595F806D2844B30E00ABA060 /* Breed+CoreData.swift in Sources */,
+				66F27AA02867FEA60030CC04 /* AnimalsNearYouViewModel.swift in Sources */,
 				AE6A3782269B57940054C842 /* SearchView.swift in Sources */,
 				595F806B2844B30E00ABA060 /* Organization+CoreData.swift in Sources */,
 				845137A72796247E00A4DA57 /* AnimalTypeSuggestionView.swift in Sources */,
@@ -835,6 +850,7 @@
 			files = (
 				592F6F8E283A41610042019B /* AccessTokenTestHelper.swift in Sources */,
 				592F6F95283A9D4A0042019B /* AccessTokenManagerTests.swift in Sources */,
+				66F27A9D286725530030CC04 /* RequestManagerMock.swift in Sources */,
 				592F6F92283A43AD0042019B /* RequestManagerTests.swift in Sources */,
 				592F6F8C283A40560042019B /* APIManagerMock.swift in Sources */,
 				847F4A0626D754D400B94FB8 /* CoreDataTests.swift in Sources */,

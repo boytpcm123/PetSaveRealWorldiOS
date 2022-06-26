@@ -1,4 +1,4 @@
-/// Copyright (c) 2022 Razeware LLC
+/// Copyright (c) 2021 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -38,21 +38,21 @@ protocol AccessTokenManagerProtocol {
   func refreshWith(apiToken: APIToken) throws
 }
 
-final class AccessTokenManager {
+class AccessTokenManager {
   private let userDefaults: UserDefaults
   private var accessToken: String?
   private var expiresAt = Date()
 
   init(userDefaults: UserDefaults = .standard) {
     self.userDefaults = userDefaults
-    update()
   }
 }
 
 // MARK: - AccessTokenManagerProtocol
 extension AccessTokenManager: AccessTokenManagerProtocol {
   func isTokenValid() -> Bool {
-    update()
+    accessToken = getToken()
+    expiresAt = getExpirationDate()
     return accessToken != nil && expiresAt.compare(Date()) == .orderedDescending
   }
 
@@ -86,10 +86,5 @@ private extension AccessTokenManager {
 
   func getToken() -> String? {
     userDefaults.string(forKey: AppUserDefaultsKeys.bearerAccessToken)
-  }
-
-  func update() {
-    accessToken = getToken()
-    expiresAt = getExpirationDate()
   }
 }

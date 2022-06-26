@@ -30,12 +30,8 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import Foundation
-@testable import PetSave
+import Combine
 
-struct APIManagerMock: APIManagerProtocol {
-  func initRequest(with data: RequestProtocol, authToken: String) async throws -> Data {
-    return try Data(contentsOf: URL(fileURLWithPath: data.path), options: .mappedIfSafe)
-  }
+final class AnimalsNearYouViewModel: ObservableObject {
+  
 }
-
