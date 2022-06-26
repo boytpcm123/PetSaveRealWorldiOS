@@ -33,66 +33,53 @@
 import SwiftUI
 
 struct AnimalsNearYouView: View {
-  @SectionedFetchRequest<String, AnimalEntity>(
-    sectionIdentifier: \AnimalEntity.animalSpecies,
+  @FetchRequest(
     sortDescriptors: [
-      NSSortDescriptor(keyPath: \AnimalEntity.species, ascending: true),
       NSSortDescriptor(keyPath: \AnimalEntity.timestamp, ascending: true)
     ],
     animation: .default
-  ) private var sectionedAnimals: SectionedFetchResults<String, AnimalEntity>
+  )
+  private var animals: FetchedResults<AnimalEntity>
 
-  @State var isLoading = true
-  private let requestManager = RequestManager()
+  @ObservedObject var viewModel: AnimalsNearYouViewModel
 
   var body: some View {
     NavigationView {
       List {
-        ForEach(sectionedAnimals) { animals in
-          Section(header: Text(animals.id)) {
-            ForEach(animals) { animal in
-              NavigationLink(destination: AnimalDetailsView()) {
-                AnimalRow(animal: animal)
-              }
-            }
+        ForEach(animals) { animal in
+          NavigationLink(destination: AnimalDetailsView()) {
+            AnimalRow(animal: animal)
           }
+        }
+        if !animals.isEmpty && viewModel.hasMoreAnimals {
+          ProgressView("Finding more animals...")
+            .padding()
+            .frame(maxWidth: .infinity)
+            .task {
+              await viewModel.fetchMoreAnimals()
+            }
         }
       }
       .task {
-        await fetchAnimals()
+        await viewModel.fetchAnimals()
       }
       .listStyle(.plain)
       .navigationTitle("Animals near you")
       .overlay {
-        if isLoading {
+        if viewModel.isLoading && animals.isEmpty {
           ProgressView("Finding Animals near you...")
         }
       }
     }
     .navigationViewStyle(StackNavigationViewStyle())
   }
-
-  func fetchAnimals() async {
-    do {
-      let animalsContainer: AnimalsContainer = try await requestManager.initRequest(with: AnimalsRequest.getAnimals)
-      for var animal in animalsContainer.animals {
-        animal.toManagedObject()
-      }
-      await stopLoading()
-    } catch {
-      print("Error fetching animals...\(error)")
-    }
-  }
-
-  @MainActor
-  func stopLoading() {
-    self.isLoading = false
-  }
 }
 
 struct AnimalsNearYouView_Previews: PreviewProvider {
   static var previews: some View {
-    AnimalsNearYouView(isLoading: false)
-      .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    AnimalsNearYouView(viewModel: AnimalsNearYouViewModel(
+      animalFetcher: AnimalsFetcherMock()
+    ))
+    .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
   }
 }
